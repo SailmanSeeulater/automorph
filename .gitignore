@@ -1,0 +1,26 @@
+# OS / editor
+.DS_STORE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Go build output
+/bin/
+*/test
+*.out
+
+# Frontend
+node_modules/
+web/dist/
+*.tsbuildinfo
+
+# Local runtime data 9SQLite DB + uploaded images)
+/data/
+*.db
+*.db-wal
+*.db-shm
