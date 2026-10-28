@@ -8,10 +8,12 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"github.com/SailmanSeeulater/automorph/internal/config"
+	"github.com/SailmanSeeulater/automorph/internal/db"
 	"github.com/SailmanSeeulater/automorph/internal/httpapi"
 )
 
@@ -32,9 +34,23 @@ func run() error {
 	}
 	logger := slog.New(handler)
 
+	if err := os.MkdirAll(cfg.DataDir, 0o750); err != nil {
+		return fmt.Errorf("create data dir: %w", err)
+	}
+	dbPath := filepath.Join(cfg.DataDir, "automorph.db")
+	sqlDB, err := db.Open(context.Background(), dbPath)
+	if err != nil {
+		return err
+	}
+	defer sqlDB.Close()
+	if err := db.Migrate(context.Background(), sqlDB, logger); err != nil {
+		return err
+	}
+	logger.Info("database ready", "path", dbPath)
+
 	srv := &http.Server{
 		Addr:              cfg.Addr,
-		Handler:           httpapi.NewRouter(logger),
+		Handler:           httpapi.NewRouter(logger, sqlDB),
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       120 * time.Second,
 	}

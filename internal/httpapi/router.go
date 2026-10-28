@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,7 +15,7 @@ import (
 const Version = "0.1.0"
 
 // NewRouter builds the HTTP handler: plain chi routes plus the huma API under /api
-func NewRouter(logger *slog.Logger) http.Handler {
+func NewRouter(logger *slog.Logger, db *sql.DB) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP) // trust X-Forwarded-For; fine because we only listen behind cloudflared
@@ -34,7 +35,7 @@ func NewRouter(logger *slog.Logger) http.Handler {
 	cfg.SchemasPath = "/api/schemas"
 	api := humachi.New(r, cfg)
 
-	registerHealth(api)
+	registerHealth(api, db)
 
 	return r
 }

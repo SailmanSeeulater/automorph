@@ -19,7 +19,7 @@ node_modules/
 web/dist/
 *.tsbuildinfo
 
-# Local runtime data 9SQLite DB + uploaded images)
+# Local runtime data SQLite DB + uploaded images)
 /data/
 *.db
 *.db-wal

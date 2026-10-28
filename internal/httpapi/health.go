@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -9,12 +10,13 @@ import (
 
 type HealthOutput struct {
 	Body struct {
-		Status  string `json:"status" example:"ok" doc:"Always \"ok\" when the server is up"`
-		Version string `json:"version" example:"0.1.0"`
+		Status   string `json:"status" example:"ok" doc:"Always \"ok\" when the server is up"`
+		Version  string `json:"version" example:"0.1.0"`
+		Database string `json:"database" example:"ok" doc:"\"ok\" or the error from pinging SQLite"`
 	}
 }
 
-func registerHealth(api huma.API) {
+func registerHealth(api huma.API, db *sql.DB) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-health",
 		Method:      http.MethodGet,
@@ -25,6 +27,10 @@ func registerHealth(api huma.API) {
 		out := &HealthOutput{}
 		out.Body.Status = "ok"
 		out.Body.Version = Version
+		out.Body.Database = "ok"
+		if err := db.PingContext(ctx); err != nil {
+			out.Body.Database = err.Error()
+		}
 		return out, nil
 	})
 }

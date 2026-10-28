@@ -11,7 +11,7 @@ type Config struct {
 
 func Load() Config {
 	return Config{
-		Addr:    getenv("ADDR", "127.0.01:8080"),
+		Addr:    getenv("ADDR", "127.0.0.1:8080"),
 		DataDir: getenv("DATA_DIR", "./data"),
 		Env:     getenv("APP_ENV", "dev"),
 	}

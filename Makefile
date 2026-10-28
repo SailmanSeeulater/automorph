@@ -18,3 +18,6 @@ build-windows:
 
 tidy:
 	go mod tidy
+
+db:
+	sqlite3 data/automorph.db
