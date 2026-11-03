@@ -1,4 +1,4 @@
-.PHONY: dev build build-linux-arm64 build-linux-amd64 build-windows tidy
+.PHONY: dev build build-linux-arm64 build-linux-amd64 build-windows tidy db sqlc admin test
 
 dev:
 	go run ./cmd/server
@@ -29,3 +29,6 @@ sqlc:
 # Create or reset the admin: make admin EMAIL=you@example.com
 admin:
 	go run ./cmd/server create-admin -email $(EMAIL)
+
+test:
+	go test ./...

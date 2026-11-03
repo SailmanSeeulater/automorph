@@ -71,6 +71,7 @@ func serve(cfg config.Config, logger *slog.Logger, sqlDB *sql.DB) error {
 		Handler: httpapi.NewRouter(httpapi.Deps{
 			Logger:        logger,
 			DB:            sqlDB,
+			Queries:       queries,
 			Auth:          auth.NewService(queries),
 			SecureCookies: !cfg.IsDev(),
 		}),

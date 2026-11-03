@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/SailmanSeeulater/automorph/internal/auth"
+	"github.com/SailmanSeeulater/automorph/internal/store"
 )
 
 const Version = "0.1.0"
@@ -20,6 +21,7 @@ const Version = "0.1.0"
 type Deps struct {
 	Logger        *slog.Logger
 	DB            *sql.DB
+	Queries       *store.Queries
 	Auth          *auth.Service
 	SecureCookies bool
 }
@@ -49,6 +51,7 @@ func NewRouter(d Deps) http.Handler {
 
 	registerHealth(api, d.DB)
 	registerAuth(api, d)
+	registerPosts(api, d)
 
 	return r
 }
