@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,19 +13,22 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/SailmanSeeulater/automorph/internal/auth"
 	"github.com/SailmanSeeulater/automorph/internal/config"
 	"github.com/SailmanSeeulater/automorph/internal/db"
 	"github.com/SailmanSeeulater/automorph/internal/httpapi"
+	"github.com/SailmanSeeulater/automorph/internal/store"
 )
 
 func main() {
-	if err := run(); err != nil {
+	if err := run(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		os.Exit(1)
 	}
 }
 
-func run() error {
+// run opens the database, then either runs a subcommand or starts the server.
+func run(args []string) error {
 	cfg := config.Load()
 
 	// Readable logs locally, JSON in production.
@@ -48,13 +52,33 @@ func run() error {
 	}
 	logger.Info("database ready", "path", dbPath)
 
+	if len(args) > 0 {
+		switch args[0] {
+		case "create-admin":
+			return createAdmin(context.Background(), store.New(sqlDB), args[1:])
+		default:
+			return fmt.Errorf("unknown command %q (available: create-admin)", args[0])
+		}
+	}
+	return serve(cfg, logger, sqlDB)
+}
+
+func serve(cfg config.Config, logger *slog.Logger, sqlDB *sql.DB) error {
+	queries := store.New(sqlDB)
+
 	srv := &http.Server{
-		Addr:              cfg.Addr,
-		Handler:           httpapi.NewRouter(logger, sqlDB),
+		Addr: cfg.Addr,
+		Handler: httpapi.NewRouter(httpapi.Deps{
+			Logger:        logger,
+			DB:            sqlDB,
+			Auth:          auth.NewService(queries),
+			SecureCookies: !cfg.IsDev(),
+		}),
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       120 * time.Second,
 	}
 
+	// Ctrl+C or SIGTERM (systemd stop) cancels ctx.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -66,7 +90,7 @@ func run() error {
 
 	select {
 	case err := <-errCh:
-		// Startup failed, e.g. the port is already is use
+		// Startup failed, e.g. the port is already in use.
 		return err
 	case <-ctx.Done():
 	}

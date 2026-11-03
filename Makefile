@@ -21,3 +21,11 @@ tidy:
 
 db:
 	sqlite3 data/automorph.db
+
+# Regenerate internal/store from internal/db/queries
+sqlc:
+	sqlc generate
+
+# Create or reset the admin: make admin EMAIL=you@example.com
+admin:
+	go run ./cmd/server create-admin -email $(EMAIL)
