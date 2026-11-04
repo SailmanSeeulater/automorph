@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/SailmanSeeulater/automorph/internal/auth"
+	"github.com/SailmanSeeulater/automorph/internal/media"
 	"github.com/SailmanSeeulater/automorph/internal/store"
 )
 
@@ -23,6 +24,7 @@ type Deps struct {
 	DB            *sql.DB
 	Queries       *store.Queries
 	Auth          *auth.Service
+	Media         *media.Store
 	SecureCookies bool
 }
 
@@ -36,11 +38,15 @@ func NewRouter(d Deps) http.Handler {
 	r.Use(middleware.Timeout(30 * time.Second))
 	r.Use(http.NewCrossOriginProtection().Handler) // rejects cross-site POST/PUT/DELETE (CSRF)
 	r.Use(d.Auth.LoadUser)
+	r.Use(adminOnly)
 
 	// Liveness check for systemd and uptime monitors. Not part of the public API.
 	r.Get("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("ok"))
 	})
+
+	// Uploaded images. Outside /api because they're plain files, not JSON.
+	r.Handle("/media/*", d.Media.Handler())
 
 	// Keep everything huma serves under /api so the React app can own every other path.
 	cfg := huma.DefaultConfig("Automorph API", Version)
@@ -52,6 +58,7 @@ func NewRouter(d Deps) http.Handler {
 	registerHealth(api, d.DB)
 	registerAuth(api, d)
 	registerPosts(api, d)
+	registerMedia(api, d)
 
 	return r
 }

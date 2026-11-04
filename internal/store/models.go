@@ -8,7 +8,7 @@ import (
 	"database/sql"
 )
 
-type Medium struct {
+type Image struct {
 	ID         int64
 	UploaderID sql.NullInt64
 	StorageKey string

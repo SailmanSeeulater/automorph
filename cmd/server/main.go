@@ -17,6 +17,7 @@ import (
 	"github.com/SailmanSeeulater/automorph/internal/config"
 	"github.com/SailmanSeeulater/automorph/internal/db"
 	"github.com/SailmanSeeulater/automorph/internal/httpapi"
+	"github.com/SailmanSeeulater/automorph/internal/media"
 	"github.com/SailmanSeeulater/automorph/internal/store"
 )
 
@@ -65,6 +66,10 @@ func run(args []string) error {
 
 func serve(cfg config.Config, logger *slog.Logger, sqlDB *sql.DB) error {
 	queries := store.New(sqlDB)
+	mediaStore, err := media.NewStore(filepath.Join(cfg.DataDir, "media"))
+	if err != nil {
+		return err
+	}
 
 	srv := &http.Server{
 		Addr: cfg.Addr,
@@ -73,6 +78,7 @@ func serve(cfg config.Config, logger *slog.Logger, sqlDB *sql.DB) error {
 			DB:            sqlDB,
 			Queries:       queries,
 			Auth:          auth.NewService(queries),
+			Media:         mediaStore,
 			SecureCookies: !cfg.IsDev(),
 		}),
 		ReadHeaderTimeout: 10 * time.Second,

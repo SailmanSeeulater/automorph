@@ -23,6 +23,7 @@ type PostSummary struct {
 	Excerpt      string     `json:"excerpt"`
 	Status       string     `json:"status" enum:"draft,published"`
 	CoverMediaID *int64     `json:"coverMediaId,omitempty"`
+	Cover        *ImageDTO  `json;"cover,omitempty"`
 	PublishedAt  *time.Time `json:"publishedAt,omitempty"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
@@ -61,6 +62,18 @@ func toSummary(p store.Post) PostSummary {
 
 func toAdminPost(p store.Post) AdminPost {
 	return AdminPost{PostSummary: toSummary(p), BodyMd: p.BodyMd, CreatedAt: time.Unix(p.CreatedAt, 0).UTC()}
+}
+
+// withCover fills in s.Cover. A missing image just means no cover, so errors are ignored.
+// It's one extra query per post, which costs microseconds with SQLite in the same process.
+func withCover(ctx context.Context, q *store.Queries, s *PostSummary) {
+	if s.CoverMediaID == nil {
+		return
+	}
+	if img, err := q.GetImage(ctx, *s.CoverMediaID); err == nil {
+		dto := toImageDTO(img)
+		s.Cover = &dto
+	}
 }
 
 // postError turns database errors into the right HTTP status.
@@ -164,7 +177,9 @@ func registerPosts(api huma.API, d Deps) {
 				out.Body.HasMore = true
 				break
 			}
-			out.Body.Items = append(out.Body.Items, toSummary(p))
+			s := toSummary(p)
+			withCover(ctx, q, &s)
+			out.Body.Items = append(out.Body.Items, s)
 		}
 		return out, nil
 	})

@@ -7,3 +7,5 @@ sql:
       go:
         package: store
         out: internal/store
+        rename:
+          medium: Image # sql singualrises "media" to "Medium"
