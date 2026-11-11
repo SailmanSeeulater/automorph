@@ -1,0 +1,91 @@
+.page {
+  min-height: 100vh;
+}
+
+/* ---- Wide screens: everything around the content is pinned to the window ---- */
+
+.rail,
+.colophon {
+  position: fixed;
+  z-index: 1;
+}
+
+.logo {
+  position: fixed;
+  top: var(--edge);
+  left: var(--edge);
+  display: block;
+  line-height: 0;
+}
+
+.nav {
+  position: fixed;
+  top: calc(var(--edge) + 14px); /* lines the text up with the middle of the logo */
+  right: var(--edge);
+  display: flex;
+  gap: var(--nav-gap);
+}
+
+.active {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rail {
+  left: calc(var(--edge) + 12px);
+  bottom: var(--edge);
+  display: flex;
+  gap: var(--rail-gap);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg); /* read bottom-to-top */
+  color: var(--muted);
+}
+
+.main {
+  padding: var(--content-y) var(--edge) calc(var(--edge) * 3) var(--content-x);
+  /* Keep text clear of the colophon column on the right. */
+  max-width: calc(var(--content-x) + var(--content-max));
+}
+
+.colophon {
+  right: var(--edge);
+  bottom: var(--edge);
+  display: grid;
+  justify-items: end;
+  gap: var(--colophon-gap);
+  max-width: 180px;
+  text-align: right;
+}
+
+.colophon p {
+  margin: 0;
+}
+
+/* ---- Narrow screens: header scrolls away, rail hides, colophon goes to the bottom ---- */
+
+@media (max-width: 1099px) {
+  .logo,
+  .nav {
+    position: absolute;
+  }
+
+  .rail {
+    display: none;
+  }
+
+  .main {
+    max-width: none;
+  }
+
+  .page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .colophon {
+    position: static;
+    margin: auto var(--edge) var(--edge) auto;
+    padding-top: calc(var(--edge) * 2);
+  }
+}

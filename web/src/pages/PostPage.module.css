@@ -1,0 +1,24 @@
+.post {
+  display: grid;
+  gap: 40px;
+}
+
+.meta {
+  display: flex;
+  gap: 32px;
+  color: var(--muted);
+}
+
+.meta a {
+  color: var(--fg);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+}
+
+.cover {
+  width: 100%;
+}

@@ -1,0 +1,64 @@
+/* Shared admin styles: form fields and buttons in the same quiet, uppercase UI as the site. */
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  color: var(--muted);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: transparent;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-bottom-color: var(--fg);
+}
+
+.textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.button {
+  padding: 8px 14px;
+  border: 1px solid var(--fg);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--fg);
+  color: var(--bg);
+  text-decoration: none;
+}
+
+.button:disabled {
+  border-color: var(--rule);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.error {
+  margin: 0;
+  color: var(--danger);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+}
+
+.muted {
+  color: var(--muted);
+}

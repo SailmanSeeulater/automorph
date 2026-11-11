@@ -1,0 +1,35 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 24px;
+  align-items: baseline;
+}
+
+.code,
+.date {
+  color: var(--muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 599px) {
+  .row {
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+  }
+
+  .code {
+    grid-column: 1 / -1;
+  }
+}

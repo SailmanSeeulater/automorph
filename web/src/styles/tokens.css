@@ -1,0 +1,53 @@
+/* Design tokens. Change spacing and type here; components only use these names. */
+:root {
+  /* Frame: everything outside the content is pinned this far from the window edge. */
+  --edge: 30px;
+  /* Where the content column starts. */
+  --content-x: 104px;
+  --content-y: 168px;
+  --content-max: 800px;
+
+  --nav-gap: 100px;
+  --rail-gap: 48px;
+  --colophon-gap: 22px;
+
+  /* Type */
+  --font: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --fs-ui: 11px; /* nav, labels, metadata */
+  --fs-body: 15px; /* article text */
+  --tracking-ui: 0.04em;
+
+  /* Colour */
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #8a8a8a;
+  --rule: #e6e6e6;
+  --danger: #c0392b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e0e0e;
+    --fg: #ececec;
+    --muted: #7a7a7a;
+    --rule: #262626;
+    --danger: #e0685b;
+  }
+}
+
+/* Below this width the frame stops being fixed and the page flows normally. */
+@media (max-width: 1099px) {
+  :root {
+    --content-x: var(--edge);
+    --content-y: 120px;
+    --nav-gap: 32px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --edge: 16px;
+    --content-y: 96px;
+    --nav-gap: 20px;
+  }
+}

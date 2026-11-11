@@ -1,0 +1,119 @@
+.editor {
+  display: grid;
+  gap: 32px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+
+.toolbarInfo,
+.toolbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 40px;
+}
+
+.titleField {
+  grid-column: 1 / -1;
+}
+
+.titleInput {
+  font-size: 22px;
+}
+
+.panes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.body {
+  min-height: 60vh;
+  font-size: 14px;
+}
+
+/* The preview scrolls with the page but stays next to the text while you write. */
+.preview {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-top: 8px;
+}
+
+.cover {
+  width: 100%;
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+/* ---- Images ---- */
+
+.images {
+  display: grid;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+
+.imagesHead {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+}
+
+.grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 20px;
+}
+
+.grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--rule);
+}
+
+.grid li {
+  display: grid;
+  gap: 8px;
+}
+
+.isCover img {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.thumbActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 899px) {
+  .meta,
+  .panes {
+    grid-template-columns: 1fr;
+  }
+
+  .preview {
+    position: static;
+    max-height: none;
+  }
+}

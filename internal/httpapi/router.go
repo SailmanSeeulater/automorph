@@ -48,6 +48,10 @@ func NewRouter(d Deps) http.Handler {
 	// Uploaded images. Outside /api because they're plain files, not JSON.
 	r.Handle("/media/*", d.Media.Handler())
 
+	// Our handlers always return [] rather than null for lists, so say so in the schema.
+	// Otherwise the generated TypeScript types make every list "Item[] | null".
+	huma.DefaultArrayNullable = false
+
 	// Keep everything huma serves under /api so the React app can own every other path.
 	cfg := huma.DefaultConfig("Automorph API", Version)
 	cfg.OpenAPIPath = "/api/openapi"

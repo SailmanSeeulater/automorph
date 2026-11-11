@@ -1,7 +1,15 @@
-.PHONY: dev build build-linux-arm64 build-linux-amd64 build-windows tidy db sqlc admin test
+.PHONY: dev web gen-api build build-linux-arm64 build-linux-amd64 build-windows tidy db sqlc admin test
 
+# Run these two in separate terminals, then open http://localhost:5180
 dev:
 	go run ./cmd/server
+
+web:
+	npm --prefix web run dev
+
+# Regenerate web/src/api/schema.d.ts from the running server (make dev first)
+gen-api:
+	npm --prefix web run gen:api
 
 build:
 	go build -o bin/automorph ./cmd/server

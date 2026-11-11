@@ -1,0 +1,69 @@
+/* Rendered post bodies. Shared by the public post page and the editor's preview,
+   so the preview looks exactly like the published post. */
+
+/* Article text is the one place we drop the uppercase UI style: long text needs to be readable. */
+.prose {
+  max-width: 640px;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  margin: 2em 0 0.75em;
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+}
+
+.prose p,
+.prose ul,
+.prose ol,
+.prose blockquote,
+.prose table {
+  margin: 0 0 1.1em;
+}
+
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose img {
+  margin: 2em 0;
+}
+
+.prose blockquote {
+  padding-left: 16px;
+  border-left: 1px solid var(--rule);
+  color: var(--muted);
+}
+
+.prose code {
+  font-size: 0.9em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: 16px;
+  border: 1px solid var(--rule);
+}
+
+.prose table {
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+}

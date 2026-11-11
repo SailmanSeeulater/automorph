@@ -1,0 +1,38 @@
+.page {
+  min-height: 100vh;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: var(--edge);
+}
+
+.logo {
+  display: block;
+  line-height: 0;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px var(--nav-gap);
+}
+
+.active {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.main {
+  padding: 24px var(--edge) calc(var(--edge) * 2);
+}
+
+@media (min-width: 1100px) {
+  .nav {
+    gap: 12px 56px;
+  }
+}

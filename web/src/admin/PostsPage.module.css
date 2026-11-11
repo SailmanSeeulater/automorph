@@ -1,0 +1,41 @@
+.page {
+  max-width: 900px;
+  display: grid;
+  gap: 32px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 72px 1fr 90px 130px 40px;
+  gap: 16px;
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.title {
+  font-weight: 500;
+}
+
+.draft {
+  color: var(--fg);
+}
+
+@media (max-width: 699px) {
+  .row {
+    grid-template-columns: 1fr auto;
+    gap: 6px 16px;
+  }
+}

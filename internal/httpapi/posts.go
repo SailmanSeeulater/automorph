@@ -23,7 +23,7 @@ type PostSummary struct {
 	Excerpt      string     `json:"excerpt"`
 	Status       string     `json:"status" enum:"draft,published"`
 	CoverMediaID *int64     `json:"coverMediaId,omitempty"`
-	Cover        *ImageDTO  `json;"cover,omitempty"`
+	Cover        *ImageDTO  `json:"cover,omitempty"`
 	PublishedAt  *time.Time `json:"publishedAt,omitempty"`
 	UpdatedAt    time.Time  `json:"updatedAt"`
 }
@@ -60,8 +60,10 @@ func toSummary(p store.Post) PostSummary {
 	return s
 }
 
-func toAdminPost(p store.Post) AdminPost {
-	return AdminPost{PostSummary: toSummary(p), BodyMd: p.BodyMd, CreatedAt: time.Unix(p.CreatedAt, 0).UTC()}
+func toAdminPost(ctx context.Context, q *store.Queries, p store.Post) AdminPost {
+	a := AdminPost{PostSummary: toSummary(p), BodyMd: p.BodyMd, CreatedAt: time.Unix(p.CreatedAt, 0).UTC()}
+	withCover(ctx, q, &a.PostSummary)
+	return a
 }
 
 // withCover fills in s.Cover. A missing image just means no cover, so errors are ignored.
@@ -153,6 +155,18 @@ type AdminPostListOutput struct {
 	}
 }
 
+type PreviewInput struct {
+	Body struct {
+		BodyMd string `json:"bodyMd" maxLength:"200000"`
+	}
+}
+
+type PreviewOutput struct {
+	Body struct {
+		HTML string `json:"html"`
+	}
+}
+
 func registerPosts(api huma.API, d Deps) {
 	q := d.Queries
 
@@ -201,7 +215,9 @@ func registerPosts(api huma.API, d Deps) {
 		if err != nil {
 			return nil, err
 		}
-		return &PublicPostOutput{Body: PublicPost{PostSummary: toSummary(p), BodyHTML: html}}, nil
+		post := PublicPost{PostSummary: toSummary(p), BodyHTML: html}
+		withCover(ctx, q, &post.PostSummary)
+		return &PublicPostOutput{Body: post}, nil
 	})
 
 	// ---- Admin (drafts included) ----
@@ -223,7 +239,9 @@ func registerPosts(api huma.API, d Deps) {
 		out := &AdminPostListOutput{}
 		out.Body.Items = make([]PostSummary, 0, len(rows))
 		for _, p := range rows {
-			out.Body.Items = append(out.Body.Items, toSummary(p))
+			s := toSummary(p)
+			withCover(ctx, q, &s)
+			out.Body.Items = append(out.Body.Items, s)
 		}
 		return out, nil
 	})
@@ -242,7 +260,7 @@ func registerPosts(api huma.API, d Deps) {
 		if err != nil {
 			return nil, postError(err)
 		}
-		return &AdminPostOutput{Body: toAdminPost(p)}, nil
+		return &AdminPostOutput{Body: toAdminPost(ctx, q, p)}, nil
 	})
 
 	huma.Register(api, huma.Operation{
@@ -276,7 +294,7 @@ func registerPosts(api huma.API, d Deps) {
 		if err != nil {
 			return nil, postError(err)
 		}
-		return &AdminPostOutput{Body: toAdminPost(p)}, nil
+		return &AdminPostOutput{Body: toAdminPost(ctx, q, p)}, nil
 	})
 
 	huma.Register(api, huma.Operation{
@@ -302,7 +320,7 @@ func registerPosts(api huma.API, d Deps) {
 		if err != nil {
 			return nil, postError(err)
 		}
-		return &AdminPostOutput{Body: toAdminPost(p)}, nil
+		return &AdminPostOutput{Body: toAdminPost(ctx, q, p)}, nil
 	})
 
 	huma.Register(api, huma.Operation{
@@ -323,5 +341,26 @@ func registerPosts(api huma.API, d Deps) {
 			return nil, huma.Error404NotFound("post not found")
 		}
 		return nil, nil
+	})
+
+	// The editor's live preview uses the same renderer as the public site,
+	// so what you see while writing is exactly what readers get.
+	huma.Register(api, huma.Operation{
+		OperationID: "admin-preview-markdown",
+		Method:      http.MethodPost,
+		Path:        "/api/admin/preview",
+		Summary:     "Render Markdown to HTML",
+		Tags:        []string{"Admin: Posts"},
+	}, func(ctx context.Context, in *PreviewInput) (*PreviewOutput, error) {
+		if _, err := requireAdmin(ctx); err != nil {
+			return nil, err
+		}
+		html, err := posts.RenderMarkdown(in.Body.BodyMd)
+		if err != nil {
+			return nil, err
+		}
+		out := &PreviewOutput{}
+		out.Body.HTML = html
+		return out, nil
 	})
 }
